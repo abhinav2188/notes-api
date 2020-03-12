@@ -31,6 +31,12 @@ const User = mongoose.model('user',{
     hash : String,
     created : Date,
     lastLoggedIn : Date,
+    notes : [{
+        created : Date,
+        updated : Date,
+        title : String,
+        content : String
+    }],
 });
 
 const port = 5000;
@@ -96,4 +102,27 @@ app.post('/login', function(req,res){
             }
         }
     })
+});
+
+app.post('/addnote/:userId', function(req,res){
+    let userId = req.params.userId;
+    let note = {
+        title: req.body.title,
+        content : req.body.content,
+        created : Date.now(),
+        updated : Date.now()
+    };
+    User.findOne({_id: userId}, function(err,foundUser){
+        if(foundUser){
+            foundUser.notes.push(note);
+            User.updateOne({_id:userId},{notes : foundUser.notes}, function(err){
+                if(!err)
+                res.status(200).json({msg:'note added',user: foundUser});
+            });
+        }else{
+            res.status(400).json({error : 'user not found'});
+        }
+    });
+
+    // res.status(200).json({msg:'notes post request',userId : req.params.userId});
 });
