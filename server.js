@@ -52,7 +52,10 @@ const User = mongoose.model('user',{
 // });
 // user1.save().then( () => console.log("user saved"));
 
-const port = 5000;
+let port = process.env.PORT;
+if(port== null || port==""){
+    port = 5000;
+}
 app.listen(port,() => {console.log("backend server started at port "+port)});
 
 app.get('/',function(req,res){
